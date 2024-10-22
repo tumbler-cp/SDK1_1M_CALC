@@ -67,22 +67,22 @@ void opErr(void) {
 	pErr("Enter first number!");
 }
 
-//void bombHasBeenPlanted(void) {
-//	oled_Fill(White);
-//	oled_SetCursor(0, 0);
-//	oled_WriteString("Bomb", Font_7x10, Black);
-//	oled_NextLine(Font_7x10);
-//	oled_WriteString("Has", Font_7x10, Black);
-//	oled_NextLine(Font_7x10);
-//	oled_WriteString("Been", Font_7x10, Black);
-//	oled_NextLine(Font_7x10);
-//	oled_WriteString("Planted", Font_7x10, Black);
-//	oled_UpdateScreen();
-//	for(int i = 0; i < 50; i++) {
-//		HAL_Delay(800 - i * 10);
-//		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
-//	}
-//}
+void bombHasBeenPlanted(void) {
+	oled_Fill(White);
+	oled_SetCursor(0, 0);
+	oled_WriteString("Bomb", Font_7x10, Black);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("Has", Font_7x10, Black);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("Been", Font_7x10, Black);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("Planted", Font_7x10, Black);
+	oled_UpdateScreen();
+	for(int i = 0; i < 80; i++) {
+		HAL_Delay(800 - i * 10);
+		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+	}
+}
 
 void operation(char ch) {
 	switch(ch) {
@@ -114,9 +114,11 @@ void keyPressed(char ch) {
 		calc.operation = ch;
 		calc.num2 = 0;
 		calc.stage = 1;
+		first = 0;
 		break;
 	case '#':
 		calc.layout = calc.layout ? 0 : 1;
+		first = 0;
 		break;
 	case '<':
 		if (!calc.stage) {
@@ -131,9 +133,13 @@ void keyPressed(char ch) {
 	case '.':
 		break;
 	case '=':
+		if (first && calc.num1 == 7355608) {
+			bombHasBeenPlanted();
+		}
 		keyPressed(calc.operation);
 		printRes();
 		calcReset();
+		first = 0;
 		break;
 	default:
 		if (!calc.stage) {
@@ -183,6 +189,8 @@ void introSlides(void) {
 	oled_WriteString("C - Reset", Font_7x10, White);
 	oled_NextLine(Font_7x10);
 	oled_WriteString(". - No operation", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("7355608 - >:)", Font_7x10, White);
 	oled_UpdateScreen();
 	HAL_Delay(3000);
 }
