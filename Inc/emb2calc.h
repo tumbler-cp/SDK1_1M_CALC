@@ -11,11 +11,12 @@ typedef struct {
 	uint8_t layout;
 } CALC_t;
 
+uint8_t isFirst(void);
 void printCalc(void);
 uint8_t getLayout(void);
 void keyPressed(char ch);
 void calcReset(void);
-void calcOut(void);
+void introSlides(void);
 
 
 #endif

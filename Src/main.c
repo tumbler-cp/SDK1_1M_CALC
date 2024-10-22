@@ -112,6 +112,8 @@ int main(void)
   oled_UpdateScreen();
   HAL_Delay(5000);
 
+  introSlides();
+
 
   /* USER CODE END 2 */
 

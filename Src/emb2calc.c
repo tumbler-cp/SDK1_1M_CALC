@@ -5,6 +5,11 @@
 #include <stdlib.h>
 
 static CALC_t calc = {0, 0, '+', 0, 1};
+static uint8_t first = 1;
+
+uint8_t isFirst (void) {
+	return first;
+}
 
 void calcReset(void) {
 	calc.num1 = 0;
@@ -62,38 +67,52 @@ void opErr(void) {
 	pErr("Enter first number!");
 }
 
+//void bombHasBeenPlanted(void) {
+//	oled_Fill(White);
+//	oled_SetCursor(0, 0);
+//	oled_WriteString("Bomb", Font_7x10, Black);
+//	oled_NextLine(Font_7x10);
+//	oled_WriteString("Has", Font_7x10, Black);
+//	oled_NextLine(Font_7x10);
+//	oled_WriteString("Been", Font_7x10, Black);
+//	oled_NextLine(Font_7x10);
+//	oled_WriteString("Planted", Font_7x10, Black);
+//	oled_UpdateScreen();
+//	for(int i = 0; i < 50; i++) {
+//		HAL_Delay(800 - i * 10);
+//		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_13);
+//	}
+//}
+
+void operation(char ch) {
+	switch(ch) {
+		case '+':
+			calc.num1 = calc.num1 + calc.num2;
+			break;
+		case '-':
+			calc.num1 = calc.num1 - calc.num2;
+			break;
+		case '*':
+			calc.num1 = calc.num1 * calc.num2;
+			break;
+		case '/':
+			if (calc.num2) {
+				calc.num1 = calc.num1 / calc.num2;
+			}
+			pErr("Dividing by zero is not allowed");
+			break;
+	}
+}
+
 void keyPressed(char ch) {
 	switch (ch) {
 	case '+':
-		calc.operation = ch;
-		calc.num1 = calc.num1 + calc.num2;
-		calc.num2 = 0;
-		calc.stage = 1;
-		break;
 	case '-':
-		calc.operation = ch;
-		calc.num1 = calc.num1 - calc.num2;
-		calc.num2 = 0;
-		calc.stage = 1;
-		break;
 	case '*':
-		calc.operation = ch;
-		if (calc.stage == 1) {
-			calc.num1 = calc.num1 * calc.num2;
-			calc.num2 = 0;
-		}
-		calc.stage = 1;
-		break;
 	case '/':
+		operation(calc.operation);
 		calc.operation = ch;
-		if (calc.stage == 1) {
-			if (calc.num2 == 0) {
-				pErr("Dividing by zero is not allowed!");
-				break;
-			}
-			calc.num1 = calc.num1 / calc.num2;
-			calc.num2 = 0;
-		}
+		calc.num2 = 0;
 		calc.stage = 1;
 		break;
 	case '#':
@@ -114,6 +133,7 @@ void keyPressed(char ch) {
 	case '=':
 		keyPressed(calc.operation);
 		printRes();
+		calcReset();
 		break;
 	default:
 		if (!calc.stage) {
@@ -122,4 +142,47 @@ void keyPressed(char ch) {
 			calc.num2 = calc.num2 * 10 + (ch - '0');
 		}
 	}
+}
+
+
+void introSlides(void) {
+	oled_Fill(Black);
+	oled_SetCursor(0, 0);
+	oled_WriteString("Number layout", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("1 2 3", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("4 5 6", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("7 8 9", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("# 0 =", Font_7x10, White);
+	oled_UpdateScreen();
+	HAL_Delay(3000);
+
+	oled_Fill(Black);
+	oled_SetCursor(0, 0);
+	oled_WriteString("Symbol layout", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("+ - .", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("* / .", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString(". . .", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("# < C", Font_7x10, White);
+	oled_UpdateScreen();
+	HAL_Delay(3000);
+
+	oled_Fill(Black);
+	oled_SetCursor(0, 0);
+	oled_WriteString("# - Change layout", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("< - Delete", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString("C - Reset", Font_7x10, White);
+	oled_NextLine(Font_7x10);
+	oled_WriteString(". - No operation", Font_7x10, White);
+	oled_UpdateScreen();
+	HAL_Delay(3000);
 }
